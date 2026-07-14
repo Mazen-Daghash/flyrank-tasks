@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
 app = FastAPI(title="Task API", version="1.0")
 
@@ -8,6 +9,15 @@ tasks = [
     {"id": 2, "title": "Build a CRUD API", "done": False},
     {"id": 3, "title": "Push to GitHub", "done": False},
 ]
+
+
+class TaskCreate(BaseModel):
+    title: str
+
+
+class TaskUpdate(BaseModel):
+    title: str | None = None
+    done: bool | None = None
 
 
 @app.get("/", summary="API info")
@@ -37,4 +47,19 @@ def get_task(task_id: int):
             status_code=404,
             content={"error": f"Task {task_id} not found"},
         )
+    return task
+
+
+@app.post("/tasks", status_code=201, summary="Create a task")
+def create_task(body: TaskCreate):
+    title = body.title.strip() if body.title else ""
+    if not title:
+        return JSONResponse(
+            status_code=400,
+            content={"error": "title is required"},
+        )
+
+    new_id = max(t["id"] for t in tasks) + 1 if tasks else 1
+    task = {"id": new_id, "title": title, "done": False}
+    tasks.append(task)
     return task
