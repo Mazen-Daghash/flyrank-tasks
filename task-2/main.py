@@ -63,3 +63,44 @@ def create_task(body: TaskCreate):
     task = {"id": new_id, "title": title, "done": False}
     tasks.append(task)
     return task
+
+
+@app.put("/tasks/{task_id}", summary="Update a task")
+def update_task(task_id: int, body: TaskUpdate):
+    task = next((t for t in tasks if t["id"] == task_id), None)
+    if not task:
+        return JSONResponse(
+            status_code=404,
+            content={"error": f"Task {task_id} not found"},
+        )
+
+    if body.title is None and body.done is None:
+        return JSONResponse(
+            status_code=400,
+            content={"error": "provide title and/or done"},
+        )
+
+    if body.title is not None:
+        title = body.title.strip()
+        if not title:
+            return JSONResponse(
+                status_code=400,
+                content={"error": "title cannot be empty"},
+            )
+        task["title"] = title
+
+    if body.done is not None:
+        task["done"] = body.done
+
+    return task
+
+
+@app.delete("/tasks/{task_id}", status_code=204, summary="Delete a task")
+def delete_task(task_id: int):
+    index = next((i for i, t in enumerate(tasks) if t["id"] == task_id), None)
+    if index is None:
+        return JSONResponse(
+            status_code=404,
+            content={"error": f"Task {task_id} not found"},
+        )
+    tasks.pop(index)
