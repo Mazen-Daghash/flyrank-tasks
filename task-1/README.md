@@ -14,8 +14,11 @@ Interactive docs (Swagger UI) are included for free at [`/docs`](http://localhos
 
 ```bash
 pip install -r requirements.txt
-uvicorn task-1.main:app --port 8000
+uvicorn main:app --port 8000
 ```
+
+(The commands above are run from inside this `task-1/` folder. If you run them from the
+repo root instead, use `uvicorn task-1.main:app --port 8000`.)
 
 Then open:
 
