@@ -1,8 +1,8 @@
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-from auth import supabase
+from auth import get_current_user, supabase
 
 app = FastAPI()
 
@@ -58,19 +58,19 @@ def public_info():
 
 
 @app.get("/protected/profile")
-def profile(request: Request):
-    """Requires a Bearer token, verified against Supabase on every request."""
-    auth_header = request.headers.get("Authorization")
-    if not auth_header or not auth_header.startswith("Bearer ") or len(auth_header) <= len("Bearer "):
-        raise HTTPException(status_code=401, detail="Access token required")
-    token = auth_header.removeprefix("Bearer ")
-
-    try:
-        response = supabase.auth.get_user(token)
-    except Exception:
-        response = None
-    if response is None or response.user is None:
-        raise HTTPException(status_code=401, detail="Invalid or expired token")
-
-    user = response.user
+def profile(user=Depends(get_current_user)):
+    """Requires a valid Bearer token, verified by the get_current_user guard."""
     return {"id": user.id, "email": user.email, "created_at": user.created_at}
+
+
+@app.get("/protected/dashboard")
+def dashboard(user=Depends(get_current_user)):
+    """Second protected route, reusing the exact same guard - no new auth code."""
+    return {"message": f"Welcome back, {user.email}!"}
+
+
+@app.post("/auth/logout", status_code=204)
+def logout(user=Depends(get_current_user)):
+    """Protected: ends the current session via Supabase."""
+    supabase.auth.sign_out()
+    return None
