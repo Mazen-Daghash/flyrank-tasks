@@ -9,6 +9,7 @@ Each task lives in its own numbered folder.
 |---------|----------------------------------------|------------------|
 | `task-1/` | W2 · A1 — CRUD to-do list API         | Python + FastAPI |
 | `task-2/` | (existing task)                        | Python + FastAPI |
+| `task-3/` | W3 · A2 — CRUD API backed by SQLite   | Python + FastAPI + SQLite |
 
 ## Running a task
 
