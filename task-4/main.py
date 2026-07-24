@@ -49,3 +49,19 @@ def login(creds: Credentials):
         "access_token": result.session.access_token,
         "refresh_token": result.session.refresh_token,
     }
+
+
+@app.get("/public/info")
+def public_info():
+    """Open endpoint, no auth required."""
+    return {"message": "Welcome stranger! This info is public."}
+
+
+@app.get("/protected/profile")
+def profile(request: Request):
+    """Requires a Bearer token. Not verified with Supabase yet - just checked for presence."""
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer ") or len(auth_header) <= len("Bearer "):
+        raise HTTPException(status_code=401, detail="Access token required")
+    token = auth_header.removeprefix("Bearer ")
+    return {"token_received": token}
