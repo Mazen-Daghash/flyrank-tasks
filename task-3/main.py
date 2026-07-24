@@ -1,17 +1,15 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from db import init_db
+from db import get_connection, init_db
 
 app = FastAPI()
 
 init_db()
 
-tasks = [
-    {"id": 1, "title": "Learn what an API is", "done": True},
-    {"id": 2, "title": "Build a hello server", "done": True},
-    {"id": 3, "title": "Finish the CRUD API", "done": False},
-]
+
+def row_to_task(row) -> dict:
+    return {"id": row["id"], "title": row["title"], "done": bool(row["done"])}
 
 
 class TaskCreate(BaseModel):
@@ -42,17 +40,26 @@ def read_health():
 
 @app.get("/tasks")
 def read_tasks():
-    """List every task currently stored in memory."""
-    return tasks
+    """List every task in the database."""
+    conn = get_connection()
+    try:
+        rows = conn.execute("SELECT * FROM tasks").fetchall()
+    finally:
+        conn.close()
+    return [row_to_task(row) for row in rows]
 
 
 @app.get("/tasks/{task_id}")
 def read_task(task_id: int):
     """Get a single task by its id, or 404 if it does not exist."""
-    task = next((t for t in tasks if t["id"] == task_id), None)
-    if task is None:
+    conn = get_connection()
+    try:
+        row = conn.execute("SELECT * FROM tasks WHERE id = ?", (task_id,)).fetchone()
+    finally:
+        conn.close()
+    if row is None:
         raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
-    return task
+    return row_to_task(row)
 
 
 @app.post("/tasks", status_code=201)
