@@ -4,7 +4,11 @@ from pydantic import BaseModel
 
 from auth import get_current_user, supabase
 
-app = FastAPI()
+app = FastAPI(
+    title="Auth API",
+    description="Sign up, log in, log out, and guard routes with Supabase-issued JWTs.",
+    version="1.0",
+)
 
 
 @app.exception_handler(HTTPException)

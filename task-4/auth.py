@@ -12,7 +12,11 @@ SUPABASE_KEY = os.environ["SUPABASE_KEY"]
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-bearer_scheme = HTTPBearer(auto_error=False)
+bearer_scheme = HTTPBearer(
+    auto_error=False,
+    bearerFormat="JWT",
+    description="Paste the access_token returned by POST /auth/login",
+)
 
 
 def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
