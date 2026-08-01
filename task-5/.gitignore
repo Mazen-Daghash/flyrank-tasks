@@ -1,0 +1,9 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+output/*.json
+output/*.csv
+!output/sample_books.json
+!output/sample_books.csv
