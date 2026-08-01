@@ -12,6 +12,7 @@ Each task lives in its own numbered folder.
 | `task-3/` | W3 · A2 — CRUD API backed by SQLite   | Python + FastAPI + SQLite |
 | `task-4/` | W2 · A4 — Auth with Supabase (login & protected routes) | Python + FastAPI + Supabase Auth |
 | `task-5/` | W5 — Scraper: fetch → parse → clean → structure (books.toscrape.com) | Python + requests + BeautifulSoup |
+| `task-6/` | W6 — Background jobs: 202 + queue/worker + retries + alerts | Python + FastAPI + SQLite |
 
 ## Running a task
 
